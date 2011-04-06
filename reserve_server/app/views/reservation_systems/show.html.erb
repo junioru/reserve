@@ -1,0 +1,49 @@
+<% content_for(:head) do%>
+  <%= javascript_include_tag 'jquery.fancybox-1.3.4.pack', 'jquery.easing-1.3.pack','fancy_box', 'jquery.maphilight.min'  %>
+  <%= stylesheet_link_tag 'jquery.fancybox-1.3.4.css' %>
+<% end %>
+
+
+
+<h1> <%= @reservationSystem.name %> </h1>
+
+<b>Category</b> <%= @reservationSystem.category %> <br/>
+<b>Address:</b>    <%= @reservationSystem.address %> <br/>
+<b>Description:</b> <% if @reservationSystem.description.nil? %>None<% else %><%= @reservationSystem.description %><% end %> <br/>
+
+<%= link_to "Edit system information", edit_user_reservationSystem_path %> <br/>
+
+<p>
+  <% unless @reservationSystem.resources.empty? %>
+  <table class = "roundTable" >
+          <%= render @resources %>
+   </table>
+      <%= will_paginate @resources %>
+  <% end %>
+<div id = "buttonwrapper">
+  <%= link_to content_tag(:span,'Add New Entry To System'), new_user_reservationSystem_resource_path(@user, @reservationSystem), :class=>"boldbuttons" %>   
+</div><br/><br/>
+
+  <% unless @reservations.empty? %>
+    <h3>Recent Reservations On <%= @reservationSystem.name %> </h3>
+    <table class ="roundTable" summary="Reservations">
+      <%= render @reservations %>
+    </table>
+    <%= will_paginate @reservations %><br/>
+  <% end %>
+
+  <% unless @floorplans.empty? %>
+    <h3>Floorplans Linked To System</h3>
+     <% for i in @floorplans %>
+	  <%= link_to (image_tag i.floorplan.url(:thumb)),  image_path(i.floorplan.url(:large)), :id=> "single_image" %>
+     <% end %><br/>
+  <% end %>
+
+  <% unless @systemReservations.empty? %>
+    <h3>System Unavailable Dates </h3>
+    <table  class ="roundTable" summary="Reservations">
+     <%= render @systemReservations %>
+    </table>
+    <%= will_paginate @systemReservations %>
+  <% end %>
+</p>

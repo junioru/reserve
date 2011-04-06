@@ -1,0 +1,17 @@
+<tr>
+<td class = "leftCell"><b>
+<% if system_reservation.recurring == 'One Time'%>
+  <%= system_reservation.startDate.strftime('%d-%b-%y') %>
+<% elsif system_reservation.recurring == 'Weekly' %>
+  <%= system_reservation.startDate.strftime('%A') %> Weekly
+<% else%>
+  <%= system_reservation.startDate.strftime('%d')%> Monthly
+<% end %>
+</b></td>
+  <td class = "midCell">
+	From:	<%= system_reservation.startDate.strftime('%I:%M%P') %><br/>
+	To: <%= system_reservation.endDate.strftime('%I:%M%P') %></td>
+  <td class = "rightCell" ><%= link_to "Delete Entry", user_reservationSystem_systemReservation_path(@user, @reservationSystem, system_reservation), :method => :delete, :confirm => "Are you sure you want to remove this Entry?",:title => "Delete Entry" %>
+</td>
+</tr>
+

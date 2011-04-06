@@ -1,0 +1,34 @@
+<% content_for(:head) do%>
+  <%= javascript_include_tag 'jquery.fancybox-1.3.4.pack', 'jquery.easing-1.3.pack','fancy_box', 'jquery.maphilight.min'  %>
+  <%= stylesheet_link_tag 'jquery.fancybox-1.3.4.css' %>
+<% end %>
+
+
+<h1>Verify Reservation</h1>
+
+<div class="cssform">
+<%= form_for :reservation, @reservation, :url => {:action => 'createreservation' } do |f| %>
+  <%= render 'shared/error_messages',:object => f.object %>
+<div class="field">
+ <%= f.label :name, 'Name of Facility: ' %><%= @resource.name %><br/>
+<div class="field">
+  <%= f.label :capacity, 'Capacity:'%> <%= @resource.capacity %>
+</div>
+<div class = "field">
+ <%= link_to (image_tag @resource.photo.url(:thumb)),  image_path(@resource.photo.url(:large)), :id=> "single_image" %>
+</div>
+  <div class="field">
+    <%= f.label :startDate,  'From: ' %><%= @startDate%> <br />
+    <%= f.hidden_field :startDate, :value => @startDate %>
+  </div>
+   <div class="field">
+    <%= f.label :endDate, 'To: '%><%= @endDate %><br />
+    <%= f.hidden_field :endDate, :value => @endDate %>
+  </div>
+  <div class="field">
+    <%= f.hidden_field :resource_id, :value => @resource.id %>
+    <%= f.submit "Confirm Reservation" %>
+  </div>
+<% end %>
+</div>
+

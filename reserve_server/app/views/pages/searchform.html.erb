@@ -1,0 +1,59 @@
+<h1>Search Available <%= params[:category].gsub('+', ' ') %> Reservations</h1>
+
+<div class="cssform">
+<%= form_tag(searchresult_path :method => "get") do %>
+<div class = "field">
+  <%= label_tag(:searchText_label, "Search for:") %><br/>
+  <%= text_field_tag(:searchText) %> <br/>
+</div>
+<% if params[:category] != 'Appointment' %>
+<div class = "field">
+  <%= label_tag(:capacity_label, "Required Capacity:") %><br/>
+  <%= text_field_tag(:capacity) %><br/>
+</div>
+<% end %>
+<div class = "field">
+  <%= label_tag(:startDate_label, "Date:") %><br/>
+  <%= date_select('search', "startDate") %><br/>
+</div >
+<div class = "field">
+  <%= label_tag(:startTime_label, "Start Time")%><br/>
+  <%= time_select('search', "startTime", options ={:include_blank => true, :ignore_date => true}, html_options={:onclick => 'toggleDurationField()'}) %> <br/>
+</div>
+<%
+=begin %> 
+  <%= label_tag(:endDate_label, "To:") %>
+  <%= date_select('reservation', "endDate") %>
+<%
+=end %> 
+<div class = "field ">
+  <%= label_tag(:endTime_label, "End Time:") %> <br/>
+  <%= time_select('search', "endTime", options = {:include_blank => true, :ignore_date => true}, html_options={:onchange => 'toggleDurationField()'})  %><br/>
+</div>
+  <%= hidden_field_tag(:category, params[:category]) %>
+<div id='durationField', style = 'display:none' class= "field">
+  <%= radio_button_tag "duration_radio", 1, true, {:id => "button1", :onclick => " disableElement('uploadNew'); disableElement('pickExisting')" } %>
+  <%= label_tag(:duration_1_label, "Search for reservation available for entire duration") %> <br/>
+  <%= radio_button_tag "duration_radio", 2, false, {:id => "button2"} %>
+  <%= label_tag(:duration_2_label, "Search for reservation available for specified duration") %><br/>
+  <%= text_field_tag :duration_hr,'', :maxlength => 2, :style=>"width:100px" %> hr
+  <%= text_field_tag :duration_min,'', :maxlength => 2, :style=> "width:100px" %> min <br/>
+</div>
+<div class = "field">
+  <%= submit_tag("Search") %>
+</div>
+<% end %>
+</div>
+<script type = 'text/javascript'>
+  function toggleDurationField(){
+    if (document.getElementById('search_startTime_4i').value != "" && document.getElementById('search_endTime_4i').value != "")
+    {
+      document.getElementById('durationField').style.display = 'block'
+    }
+    else
+    {
+      document.getElementById('durationField').style.display = 'none'
+    }
+  }
+
+</script>

@@ -1,0 +1,432 @@
+commit 4b504db3a7ee4bc713a38f90ad67d6904ae31315
+Author: Junru <urnujil@gmail.com>
+Date:   Fri Dec 31 22:47:16 2010 +0800
+
+    Initial commit
+
+diff --git a/app/controllers/application_controller.rb b/app/controllers/application_controller.rb
+index e8065d9..6d4bf3c 100644
+--- a/app/controllers/application_controller.rb
++++ b/app/controllers/application_controller.rb
+@@ -1,3 +1,4 @@
+ class ApplicationController < ActionController::Base
+   protect_from_forgery
++  include SessionsHelper
+ end
+diff --git a/app/controllers/sessions_controller.rb b/app/controllers/sessions_controller.rb
+new file mode 100644
+index 0000000..0f0daa6
+--- /dev/null
++++ b/app/controllers/sessions_controller.rb
+@@ -0,0 +1,24 @@
++class SessionsController < ApplicationController
++  def new
++    @title = "Sign in"
++  end
++
++  def create
++    user = User.authenticate(params[:session][:email],
++                           params[:session][:password])
++    if user.nil?
++      flash.now[:error] = "Invalid email/password combination."
++      @title = "Sign in"
++      render 'new'
++    else
++      sign_in user
++      redirect_to user    
++    end
++  end
++
++  def destroy
++    sign_out
++    redirect_to root_path
++  end
++
++end
+diff --git a/app/controllers/users_controller.rb b/app/controllers/users_controller.rb
+new file mode 100644
+index 0000000..e0dd2e5
+--- /dev/null
++++ b/app/controllers/users_controller.rb
+@@ -0,0 +1,23 @@
++class UsersController < ApplicationController
++  def new
++    @user = User.new
++    @title = "Sign Up"
++  end
++
++  def show
++    @user = User.find(params[:id])
++  end
++
++  def create
++    @user = User.new(params[:user])
++    if @user.save
++      sign_in @user
++      flash[:success] = "Welcome to the Reservation System!"
++      redirect_to @user
++    else
++      @title = "Sign Up"
++      render 'new'
++    end
++  end
++
++end
+diff --git a/app/helpers/sessions_helper.rb b/app/helpers/sessions_helper.rb
+new file mode 100644
+index 0000000..27b09de
+--- /dev/null
++++ b/app/helpers/sessions_helper.rb
+@@ -0,0 +1,36 @@
++module SessionsHelper
++
++  def sign_in(user)
++    cookies.permanent.signed[:remember_token] = [user.id, user.salt]
++    current_user = user
++  end
++    
++  def current_user=(user)
++    @current_user = user
++  end
++
++  def current_user
++    @current_user ||= user_from_remember_token
++  end
++
++  def signed_in?
++    !current_user.nil?
++  end
++
++  def sign_out
++    cookies.delete(:remember_token)
++    current_user = nil
++  end
++
++
++  private
++
++    def user_from_remember_token
++      User.authenticate_with_salt(*remember_token)
++    end
++
++    def remember_token
++      cookies.signed[:remember_token] || [nil, nil]
++    end
++
++end
+diff --git a/app/helpers/users_helper.rb b/app/helpers/users_helper.rb
+new file mode 100644
+index 0000000..2310a24
+--- /dev/null
++++ b/app/helpers/users_helper.rb
+@@ -0,0 +1,2 @@
++module UsersHelper
++end
+diff --git a/app/models/user.rb b/app/models/user.rb
+index f086bed..0163895 100644
+--- a/app/models/user.rb
++++ b/app/models/user.rb
+@@ -40,17 +40,18 @@ class User < ActiveRecord::Base
+   def check_password?(submitted_password)
+     self.encrypted_password == encrypt(submitted_password)
+   end
++  
++  def self.authenticate(email, submitted_password)
++    user = find_by_email(email)
++    return nil  if user.nil?
++    return user if user.check_password?(submitted_password)
++  end
+ 
+-  def self.authenticate(mobile_number, submitted_password)
+-    user = find_by_mobile_number(mobile_number)
+-    if user.nil?
+-      return nil
+-    elsif user.check_password?(submitted_password)
+-      return user
+-    else
+-      return nil
+-    end
++  def self.authenticate_with_salt(id, cookie_salt)
++    user = find_by_id(id)
++    (user && user.salt == cookie_salt) ? user : nil
+   end
++
+   private
+     def encrypt_password
+       self.salt = make_salt if new_record? #create salt only the first time record is created
+diff --git a/app/views/sessions/new.html.erb b/app/views/sessions/new.html.erb
+new file mode 100644
+index 0000000..72ede7a
+--- /dev/null
++++ b/app/views/sessions/new.html.erb
+@@ -0,0 +1,17 @@
++<h1>Sign in</h1>
++<%= form_for(:session, :url => sessions_path) do |f| %>
++  <div class="field">
++    <%= f.label :email %><br />
++    <%= f.text_field :email %>
++  </div>
++  <div class="field">
++    <%= f.label :password %><br />
++    <%= f.password_field :password %>
++  </div>
++  <div class="actions">
++    <%= f.submit "Sign in" %>
++  </div>
++<% end %>
++
++<p>New user? <%= link_to "Sign up now!", signup_path %></p>
++
+diff --git a/app/views/shared/_error_messages.html.erb b/app/views/shared/_error_messages.html.erb
+new file mode 100644
+index 0000000..07ac154
+--- /dev/null
++++ b/app/views/shared/_error_messages.html.erb
+@@ -0,0 +1,13 @@
++<% if @user.errors.any? %>
++  <div id="error_explanation">
++    <h2><%= pluralize(@user.errors.count, "error") %> 
++        prohibited this user from being saved:</h2>
++    <p>There were problems with the following fields:</p>
++    <ul>
++    <% @user.errors.full_messages.each do |msg| %>
++      <li><%= msg %></li>
++    <% end %>
++    </ul>
++  </div>
++<% end %>
++
+diff --git a/app/views/users/new.html.erb b/app/views/users/new.html.erb
+new file mode 100644
+index 0000000..253a74e
+--- /dev/null
++++ b/app/views/users/new.html.erb
+@@ -0,0 +1,29 @@
++<h1>Sign up new user</h1>
++
++<%= form_for(@user) do |f| %>
++  <%= render 'shared/error_messages' %>
++  <div class="field">
++    <%= f.label :name %><br />
++    <%= f.text_field :name %>
++  </div>
++  <div class="field">
++    <%= f.label :email %><br />
++    <%= f.text_field :email %>
++  </div>
++  </div class="field">
++    <%= f.label :mobile_number, "Mobile Number" %><br />
++    <%= f.text_field :mobile_number %>
++  </div>
++  <div class="field">
++    <%= f.label :password %><br />
++    <%= f.password_field :password %>
++  </div>
++  <div class="field">
++    <%= f.label :password_confirmation, "Enter your password again" %><br />
++    <%= f.password_field :password_confirmation %>
++  </div>
++  <div class="actions">
++    <%= f.submit "Sign up" %>
++  </div>
++<% end %>
++
+diff --git a/app/views/users/show.html.erb b/app/views/users/show.html.erb
+new file mode 100644
+index 0000000..58d3cc7
+--- /dev/null
++++ b/app/views/users/show.html.erb
+@@ -0,0 +1,2 @@
++<%= @user.name %>, <%= @user.email %>
++
+diff --git a/config/routes.rb b/config/routes.rb
+index 3081ed6..078f040 100644
+--- a/config/routes.rb
++++ b/config/routes.rb
+@@ -1,7 +1,12 @@
+ FYP::Application.routes.draw do
++  # get "sessions/new"
++
+   resources :users
++  resources :sessions, :only => [:new, :create, :destroy]
+ 
+   match '/signup', :to => 'users#new'
++  match '/signin', :to => 'sessions#new'
++  match '/signout', :to => 'sessions#destroy'
+ 
+   # The priority is based upon order of creation:
+   # first created -> highest priority.
+diff --git a/db/migrate/20101220085706_create_users.rb b/db/migrate/20101220085706_create_users.rb
+new file mode 100644
+index 0000000..2dd1cf8
+--- /dev/null
++++ b/db/migrate/20101220085706_create_users.rb
+@@ -0,0 +1,17 @@
++class CreateUsers < ActiveRecord::Migration
++  def self.up
++    create_table :users do |t|
++      t.string :name
++      t.string :email
++      t.string :encrypted_password
++      t.string :salt
++      t.string :mobile_number
++
++      t.timestamps
++    end
++  end
++
++  def self.down
++    drop_table :users
++  end
++end
+diff --git a/db/migrate/20101220095124_add_user_unqiueness_index.rb b/db/migrate/20101220095124_add_user_unqiueness_index.rb
+new file mode 100644
+index 0000000..4a00f4d
+--- /dev/null
++++ b/db/migrate/20101220095124_add_user_unqiueness_index.rb
+@@ -0,0 +1,11 @@
++class AddUserUnqiuenessIndex < ActiveRecord::Migration
++  def self.up
++    add_index :users, :email, :unique =>true
++    add_index :users, :mobile_number, :unique => true
++  end
++
++  def self.down
++    remove_index :users, :email
++    remove_index :users, :mobile_number
++  end
++end
+diff --git a/db/schema.rb b/db/schema.rb
+new file mode 100644
+index 0000000..0b870cd
+--- /dev/null
++++ b/db/schema.rb
+@@ -0,0 +1,28 @@
++# This file is auto-generated from the current state of the database. Instead
++# of editing this file, please use the migrations feature of Active Record to
++# incrementally modify your database, and then regenerate this schema definition.
++#
++# Note that this schema.rb definition is the authoritative source for your
++# database schema. If you need to create the application database on another
++# system, you should be using db:schema:load, not running all the migrations
++# from scratch. The latter is a flawed and unsustainable approach (the more migrations
++# you'll amass, the slower it'll run and the greater likelihood for issues).
++#
++# It's strongly recommended to check this file into your version control system.
++
++ActiveRecord::Schema.define(:version => 20101220095124) do
++
++  create_table "users", :force => true do |t|
++    t.string   "name"
++    t.string   "email"
++    t.string   "encrypted_password"
++    t.string   "salt"
++    t.string   "mobile_number"
++    t.datetime "created_at"
++    t.datetime "updated_at"
++  end
++
++  add_index "users", ["email"], :name => "index_users_on_email", :unique => true
++  add_index "users", ["mobile_number"], :name => "index_users_on_mobile_number", :unique => true
++
++end
+diff --git a/test/fixtures/users.yml b/test/fixtures/users.yml
+new file mode 100644
+index 0000000..341b228
+--- /dev/null
++++ b/test/fixtures/users.yml
+@@ -0,0 +1,30 @@
++# == Schema Information
++# Schema version: 20101220085706
++#
++# Table name: users
++#
++#  id                 :integer(4)      not null, primary key
++#  name               :string(255)
++#  email              :string(255)
++#  encrypted_password :string(255)
++#  salt               :string(255)
++#  mobile_number      :string(255)
++#  created_at         :datetime
++#  updated_at         :datetime
++#
++
++# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
++
++one:
++  name: MyString
++  email: MyString
++  encrypted_password: MyString
++  salt: MyString
++  mobile_number: 1
++
++two:
++  name: MyString
++  email: MyString
++  encrypted_password: MyString
++  salt: MyString
++  mobile_number: 1
+diff --git a/test/functional/sessions_controller_test.rb b/test/functional/sessions_controller_test.rb
+new file mode 100644
+index 0000000..75db968
+--- /dev/null
++++ b/test/functional/sessions_controller_test.rb
+@@ -0,0 +1,9 @@
++require 'test_helper'
++
++class SessionsControllerTest < ActionController::TestCase
++  test "should get new" do
++    get :new
++    assert_response :success
++  end
++
++end
+diff --git a/test/functional/users_controller_test.rb b/test/functional/users_controller_test.rb
+new file mode 100644
+index 0000000..7d2d9b1
+--- /dev/null
++++ b/test/functional/users_controller_test.rb
+@@ -0,0 +1,9 @@
++require 'test_helper'
++
++class UsersControllerTest < ActionController::TestCase
++  test "should get new" do
++    get :new
++    assert_response :success
++  end
++
++end
+diff --git a/test/unit/helpers/sessions_helper_test.rb b/test/unit/helpers/sessions_helper_test.rb
+new file mode 100644
+index 0000000..7d44e09
+--- /dev/null
++++ b/test/unit/helpers/sessions_helper_test.rb
+@@ -0,0 +1,4 @@
++require 'test_helper'
++
++class SessionsHelperTest < ActionView::TestCase
++end
+diff --git a/test/unit/helpers/users_helper_test.rb b/test/unit/helpers/users_helper_test.rb
+new file mode 100644
+index 0000000..96af37a
+--- /dev/null
++++ b/test/unit/helpers/users_helper_test.rb
+@@ -0,0 +1,4 @@
++require 'test_helper'
++
++class UsersHelperTest < ActionView::TestCase
++end
+diff --git a/test/unit/user_test.rb b/test/unit/user_test.rb
+new file mode 100644
+index 0000000..a64d2d3
+--- /dev/null
++++ b/test/unit/user_test.rb
+@@ -0,0 +1,8 @@
++require 'test_helper'
++
++class UserTest < ActiveSupport::TestCase
++  # Replace this with your real tests.
++  test "the truth" do
++    assert true
++  end
++end

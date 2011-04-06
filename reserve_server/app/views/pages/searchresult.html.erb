@@ -1,0 +1,38 @@
+<% content_for(:top) do%>
+
+<h3><div style="float:left;width:50%;"><%= link_to_function content_tag(:span,"Map View"), "enableElement('map_canvas'); disableElement('result_list')" %></div>
+<div style="float:left;width:50%;"><%= link_to_function content_tag(:span,"List View"), "disableElement('map_canvas'); enableElement('result_list')" %></div></h3>
+<div style="display:block"><h2> Found <%= pluralize(@results.length, "Match") %> </h2>
+</div>
+<% end %>
+
+<div id='result_list' style = "display:none;" >
+  <table class ="roundTable" summary="My Reservation Systems">
+      <% for a in 0...@results.length %>
+      <%= render :partial => @results[a], :locals => {:count => @resourceCount[a]} %>
+      <% end %>
+    </tr>
+  </table>
+  <%= will_paginate @results %>
+</div>
+
+<script type="text/javascript">
+  addLoadEvent(loadMap());
+  var marker_arr = [];
+  <% for i in 0...@results.length %>
+    var index = marker_arr.length;
+    var temp = "<%= @results[i].location.gsub(/[()]/,'') %>".split(",");
+    marker_arr[index] = { lat: parseFloat(temp[0]) , lng: parseFloat(temp[1]), 
+                          name: "<%= @results[i].name %>", description: "Available Resources: <%= @resourceCount[i] %> <br/> <%= @results[i].description %>",
+                          link: '<%= h form_tag(resourceresult_path :method => "get") do %>' +
+                                  '<%= hidden_field_tag(:text, @text) %>' + '<%= hidden_field_tag(:capacity, @capacity) %>'+
+                                  '<%= hidden_field_tag(:startTime, @startTime) %>' +  '<%= hidden_field_tag(:endTime, @endTime) %>'+
+                                   '<%= hidden_field_tag(:startTimeUpper, @startTime_upper) %>' +  '<%= hidden_field_tag(:endTimeLower, @endTime_lower) %>'+
+                                  '<%= hidden_field_tag(:startDate, @startDate) %>'+ '<%= hidden_field_tag(:reservationID, @results[i].id) %>' +
+                                  '<%= hidden_field_tag(:category, @category) %>' +  '<%= hidden_field_tag(:duration, @duration) %>' +
+                                  '<%= submit_tag("Book Here")%>' + '<% end%>' };
+    <% end %>
+    addLoadEvent(function(){placeMarker(marker_arr)});
+</script>             
+
+

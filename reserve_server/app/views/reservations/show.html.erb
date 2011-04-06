@@ -1,0 +1,68 @@
+<% content_for(:head) do%>
+  <%= javascript_include_tag 'rating_ballot' %>
+<% end %>
+
+
+<h1>Reservation Detail</h1>
+
+<h3><%= @reservationSystem.name %></h3>
+<b>Category</b><br/>
+<%= @reservationSystem.category %><br/><br/>
+<b>Address</b><br/>
+<%= @reservationSystem.address %><br/><br/>
+<% unless @reservationSystem.location.empty? %>
+<div id="buttonwrapper">
+  <%= link_to (content_tag(:span,"View Location on Map")), show_location_user_reservationSystem_path(:id => @reservationSystem.id) , :class=>"boldbuttons"%></div><br/><br/>
+<% end %>
+<b>Resource Name</b><br/>
+<%= @resource.name %> <br/><br/>
+<% if not @reservationSystem.category == "Appointment" %>
+<b>Capacity </b><br/>
+<%= @resource.capacity %> <br/><br/>
+<% end %>
+
+<% unless @resource.description.empty? %> <br/>
+<%= @resource.description %><br/><br/>
+<% end %>
+
+<% if @resource.photo.file?  %>
+   <%= link_to (image_tag @resource.photo.url(:thumb)), image_path(@resource.photo.url(:large)), :id=> "single_image" %><br/>
+<% end %>
+
+<b>From</b><br/>             <%= @reservation.startDate %> <br/><br/>
+<b>To:</b><br/>               <%= @reservation.endDate %> <br/><br/>
+<b>Current Status:</b><br/>   <%= @reservation.status %> <br/><br/>
+<b>Last Modified At:</b><br/> <%= @reservation.updated_at %> <br/><br/>
+<b>Average Customer Ratings:</b>
+<% if @resource.ratings.size == 0 %>
+ No ratings have been left yet<br/><br/>
+<% else %>
+ <%= @resource.average_rating %> (Left by  <%= pluralize(@resource.ratings.size, 'customer')%>) <br/><br/>
+<% end %>
+<% if not @reservationSystem.user.id == @user.id %>
+
+<b>My Rating for this </b>
+    <%= form_for(rating_ballot(@resource.id), :remote => true, :html => { :class => 'rating_ballot' }) do |f| %>
+    <%=  f.label("value_1", content_tag(:span, '1'), {:class=>"rating", :id=>"1"}) %>
+    <%=  radio_button_tag("rating[value]", 1, current_user_rating(@resource.id) == 1, :class => 'rating_button') %>
+    <%= f.label("value_2", content_tag(:span, '2'), {:class=>"rating", :id=>"2"}) %>
+    <%= radio_button_tag("rating[value]", 2, current_user_rating(@resource.id) == 2, :class => 'rating_button') %>
+    <%= f.label("value_3", content_tag(:span, '3'), {:class=>"rating", :id=>"3"}) %>
+    <%= radio_button_tag("rating[value]", 3, current_user_rating(@resource.id) == 3, :class => 'rating_button') %>
+    <%= f.label("value_4", content_tag(:span, '4'), {:class=>"rating", :id=>"4"}) %>
+    <%= radio_button_tag("rating[value]", 4, current_user_rating(@resource.id) == 4, :class => 'rating_button') %>
+    <%= f.label("value_5", content_tag(:span, '5'), {:class=>"rating", :id=>"5"}) %>
+    <%=  radio_button_tag("rating[value]", 5, current_user_rating(@resource.id) == 5, :class => 'rating_button') %>
+    <%=  hidden_field_tag("resource_id", @resource.id) %>
+    <%= f.submit :Submit %>
+    <% end %>
+<br/><br/>
+<% end %>
+<% if  @resource.allowcancel? and @reservation.status != 'Cancelled' %>
+<br/>
+  <%= form_for :reservation, @reservation, :url => {:action => 'cancel'} , :html => { :method => :get }  do |f| %>
+   <%= render 'shared/error_messages',:object => f.object %>
+      <%= f.submit "Cancel Reservation" , :html => {:confirm  =>"Are you sure you want to cancel this reservation?", :class => 'cancel'} %>
+    </div><br/><br/>
+  <% end %>
+<% end %>

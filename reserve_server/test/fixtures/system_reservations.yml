@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  user_id: 
+  startDate: 2011-03-24 19:59:42
+  endDate: 2011-03-24 19:59:42
+  recurring: MyString
+  description: MyText
+
+two:
+  user_id: 
+  startDate: 2011-03-24 19:59:42
+  endDate: 2011-03-24 19:59:42
+  recurring: MyString
+  description: MyText

@@ -1,0 +1,273 @@
+/* Google Map */
+  html { height: 100% }
+  body { height: 100%; margin: 0px; padding: 0px }
+  #map_canvas { height: 80% }
+
+/* Main body */
+body {background-color:#6D7B8D; color: #FFFFFF;  font-family: arial;} 
+a:link { color: #FFF; text-decoration: underline; font-weight:bold}
+a:visited { color: #FFF; text-decoration: underline; font-weight:bold}
+a:active { color: #FFF; text-decoration: none;}
+a:hover { color: #000; text-decoration: underline; font-weight:bold;}
+h1,h2,h3 { text-align:center;}
+
+img {
+border:0px;
+}
+
+div.indeximg {
+width:100%;
+text-align:center;
+
+}
+#loading {  
+     float: bottom; 
+     text-align:center;  
+     padding:7px 0 0 0;  
+     font:bold 11px Arial, Helvetica, sans-serif;  
+}  
+
+/* Button */
+/*Credits: Dynamic Drive CSS Library */
+/*URL: http://www.dynamicdrive.com/style/ */
+
+a.boldbuttons{
+background: transparent url('img/roundedge-gray-left.png') no-repeat top left;
+display: block;
+float: left;
+font: bold 1em Arial; /* Change 13px as desired */
+line-height: 22px; /* This value + 4px + 4px (top and bottom padding of SPAN) must equal height of button background (default is 30px) */
+height: 30px; /* Height of button background height */
+padding-left: 8px; /* Width of left menu image */
+text-decoration: none;
+
+}
+
+a:link.boldbuttons, a:visited.boldbuttons, a:hover.boldbuttons, a:active.boldbuttons{
+color: white; /*button text color*/
+}
+
+a.boldbuttons span{
+background: transparent url('img/roundedge-gray-right.png') no-repeat top right;
+display: block;
+padding: 4px 10px 4px 2px; /*Set 10px to be equal or greater than'padding-left' value above*/
+}
+
+a:hover.boldbuttons{ /* Hover state CSS */
+text-decoration: underline;
+}
+
+
+.redbuttons{
+background: transparent url('img/roundedge-red-left.png') no-repeat top left;
+display: block;
+float: left;
+font: bold 1em Arial; /* Change 13px as desired */
+line-height: 22px; /* This value + 4px + 4px (top and bottom padding of SPAN) must equal height of button background (default is 30px) */
+height: 30px; /* Height of button background height */
+padding-left: 8px; /* Width of left menu image */
+text-decoration: none;
+
+}
+
+a:link.redbuttons, a:visited.redbuttons, a:hover.redbuttons, a:active.redbuttons{
+color: white; /*button text color*/
+}
+
+a.redbuttons span{
+background: transparent url('img/roundedge-red-right.png') no-repeat top right;
+display: block;
+padding: 4px 10px 4px 2px; /*Set 10px to be equal or greater than'padding-left' value above*/
+}
+
+a:hover.redbuttons{ /* Hover state CSS */
+text-decoration: underline;
+}
+
+buttonwrapper{ /* Container you can use to surround a CSS button to clear float */
+overflow: hidden; /*See: http://www.quirksmode.org/css/clearing.html */
+width: 100%;
+}
+
+/* Navigation bar */
+#navbar{
+width:auto;
+height:36px;
+background:url(img/navbar-bg.png) left top repeat-x; 
+text-align:center;}
+#navbar .inbar{
+display:block;
+height:36px;
+background:url(img/right-round.png) right top no-repeat; }
+#navbar ul, #navbar ul li{
+border:0px;
+margin:0px;
+padding:0px;
+list-style:none;
+height:36px;
+line-height:36px; } #navbar ul{
+background:url(img/left-round.png) left top no-repeat; }
+#navbar ul li{
+float:left;
+display:block;
+line-height:36px; }
+#navbar ul li a{
+color:#403e32;
+text-decoration:none;
+font-weight:bold;
+font-size: 0.8em;
+display:block; }
+#navbar ul li a span{
+padding:0 20px 0 0;
+height:36px;
+line-height:36px;
+display:block;
+margin-left:20px; }
+#navbar .navhome a, #navbar .navhome a:hover {
+background:url(img/a-bg.png) left top no-repeat;
+height:36px;
+line-height:36px; }
+#navbar .navhome a span, #navbar .navhome a:hover span{
+color:#FFFFFF;
+background:url(img/span-bg.png) right top no-repeat;
+height:36px;
+line-height:36px; }
+#navbar ul li a:hover {
+background:url(img/ahover-bg.png) left top no-repeat;
+height:36px;
+line-height:36px; }
+#navbar ul li a:hover span{
+background:url(img/spanhover-bg.png) right top no-repeat;
+height:36px;
+line-height:36px; } 
+
+
+/* Round Table */
+.roundTable {
+  -moz-border-radius:    15px;
+  -webkit-border-radius: 15px;
+  border-radius:         15px;
+  -khtml-border-radius:  15px;
+  background-color : #999999;
+  width : 100%;
+  border-collapse: collapse;
+  border : 0px; 
+}
+
+.plain {
+  border-bottom : 0px;
+}
+
+td {
+  border-bottom : 3px solid #6D7B8D;
+}
+
+tr {
+ height :110px;
+}
+.leftCell {
+  width : 20%;
+}
+
+.midCell {
+  width : 60%;
+}
+
+.rightCell {
+  width :20%;
+}
+
+div.field, div.actions {
+  margin-bottom: 10px;
+}
+
+/* Error message */
+.field_with_errors {
+  display: table;
+}
+
+.field_with_errors label {
+  color: red;
+}
+
+#error_explanation {
+  width: 400px;
+  border: 2px solid red;
+  padding: 7px;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  background-color: #f0f0f0;
+}
+
+#error_explanation h2 {
+  text-align: left;
+  font-weight: bold;
+  padding: 5px 5px 5px 15px;
+  font-size: 12px;
+  margin: -7px;
+  background-color: #c00;
+  color: #333;
+}
+
+#error_explanation p {
+  color: #333;
+  margin-bottom: 0;
+  padding: 5px;
+}
+
+#error_explanation ul li {
+  font-size: 12px;
+  list-style: square;
+  color : #333;
+}
+
+
+
+form.rating_ballot input#rating_submit { display: none; }
+form.rating_ballot input.rating_button { display: none; }
+
+
+form.rating_ballot label.rating { cursor: pointer; display: block; height: 20px; width: 20px; float: left; }
+form.rating_ballot label.rating span { display: none; }
+form.rating_ballot label.rating { background-image: url(../images/star-dim.png); }
+form.rating_ballot label.rating.bright { background-image: url(../images/star-bright.png); }
+form.rating_ballot label.rating.glow { background-image: url(../images/star-glow.png); }
+
+.field {
+padding: 6px 0 6px 0;
+border-top: 1px dashed black;
+height: 1%;
+}
+
+.cssform label{
+font-weight: bold;
+}
+
+.cssform input{ /*width of text boxes. IE6 does not understand this attribute*/
+width:240px;
+height : 2em;
+}
+
+.cssform textarea{
+width: 240px;
+height: 4em;
+}
+
+.cssform select{
+width 240px;
+height 2em;
+}
+
+.cssform .shortselect{
+width :auto;
+}
+
+/* Cancel submit button */
+.cancel {
+cursor:pointer;
+border:outset 1px #ccc;
+background:#999;
+color:#666;
+font-weight:bold;
+padding: 1px 2px;
+}

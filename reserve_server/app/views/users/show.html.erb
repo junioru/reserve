@@ -1,0 +1,37 @@
+<% content_for(:head) do%>
+  <% javascript_include_tag 'rating_ballot', 'jquery.fancybox-1.3.4.pack', 'jquery.easing-1.3.pack','fancy_box', 'jquery.maphilight.min'  %>
+  <%= stylesheet_link_tag 'jquery.fancybox-1.3.4.css' %>
+<% end %>
+
+<h1>Welcome <%= @user.name %> </h1>
+<p>
+  <% if @user.user_type == 'business' and params[:mode]=='business' %>
+    <% unless @user.reservation_systems.empty? %>
+      <h3>My Reservation Systems</h3>
+      <table class ="roundTable" summary="My Reservation Systems" >
+          <%= render @reservationSystems %>
+        </tr>
+      </table>
+      <%= will_paginate @reservationSystems %>
+    <% end %><br/>
+<div id="buttonwrapper">
+    <%= link_to (content_tag(:span,"Add New Reservation System")), new_user_reservationSystem_path(@user), :class => "boldbuttons"  %>
+</div><br/><br/>
+    <h3>Recent Reservations On My Systems</h3>
+    <% unless @reservations.empty? %>
+     <table class ="roundTable" summary="Reservations">
+        <%= render @reservations %>
+      </table>
+    <%= will_paginate @reservations %>
+    <% end %> 
+  <% else %>
+    <h3>My Reservations</h3>
+      <% unless @user.reservations.empty? %>
+        <table class ="roundTable" summary="My Reservations">
+       <%= render @myreservations %>
+      </table>
+    <%= will_paginate @myreservations %>
+    <% end %> 
+  <% end %>
+</p>
+

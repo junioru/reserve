@@ -1,0 +1,37 @@
+<tr>
+<% if params[:action]=="searchresult" %>
+
+  <td class = "leftCell"><b><%= reservation_system.name %></b> </td>
+  <td class = "midCell" ><%= reservation_system.description %> <br/>
+  Number of Available Resources: <%= count %><br/>
+  <% if reservation_system.average_rating >= 0 %>
+	<%= pluralize(reservation_system.rating_count, "customer")%> left rating for this <br/>
+	<%= render 'shared/rating', :rating => reservation_system.average_rating %>
+  <% else %>
+    No rating have been left yet
+  <% end %><br/>
+  <td class = "rightCell">    
+    <%= h form_tag(resourceresult_path :method => "get") do %>
+        <%= hidden_field_tag(:text, @text) %> 
+        <%= hidden_field_tag(:capacity, @capacity) %>
+        <%= hidden_field_tag(:startTime, @startTime) %>
+        <%= hidden_field_tag(:endTime, @endTime) %>
+        <%= hidden_field_tag(:startTimeUpper, @startTime_upper) %>
+        <%= hidden_field_tag(:endTimeLower, @endTime_lower) %>
+        <%= hidden_field_tag(:startDate, @startDate) %>
+        <%= hidden_field_tag(:reservationID, reservation_system.id) %>
+        <%= hidden_field_tag(:category, @category) %>
+        <%= hidden_field_tag(:duration, @duration) %>
+        <%= submit_tag("Book Here")%>
+      <% end %>
+  </td>
+<% else %>
+  <td class = "leftCell"></td>
+  <td class = "midCell">
+	<b><%= reservation_system.name %></b> <br/>
+	<%= reservation_system.category %><br/>
+	<%= reservation_system.address %><br/>
+  </td>
+  <td class = "rightCell"><%= link_to "View Details", user_reservationSystem_path(@user,reservation_system) %></td>
+<% end %>
+</tr>

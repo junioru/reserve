@@ -1,0 +1,151 @@
+<h1>Select the time slot you wish to reserve </h1>
+<h3>Each Slot Represents 
+<% if @resource.min_duration >= 3600 %>
+  <%= pluralize( @resource.min_duration/3600 , "hour") %>
+<% end %>
+<% if @resource.min_duration%3600 > 0 %>
+  <%= pluralize( (@resource.min_duration%3600)/60, "minute") %>
+<% end %></h3>
+<br/>
+
+<div class="cssform">
+<%= form_tag(confirmreservation_path , :id => "resourceReservation") do %>
+<%= hidden_field_tag(:resourceID, params[:resourceID]) %>
+<%= label_tag(:startDatelabel, "From :") %>
+<%= text_field_tag(:startDate, "", :readonly => 'true') %>
+<%= label_tag(:endDateLabel, "To :") %>
+<%= text_field_tag(:endDate, "", :readonly => 'true') %> <br/><br/>
+<%= submit_tag("Submit Reservation") %>
+<% end %>
+</div>
+
+<table border='3' bordercolor='black' id ="resourceTable" >  
+  <% for i in -3..3 %>
+    <tr>
+      <td class = "plain" style="background-color:Navy"><b><%= (Time.parse(@date) + i.day).strftime('%a %d/%b/%Y ') %></b></td>
+      <% time = @startTime %>
+      <% for j in @timeArr %>
+        <% currDateTime = DateTime.strptime(@date,'%a %d-%b-%y %I:%M%p').advance(:seconds => j, :days => i) %>
+        <% currDateTimeEnd = currDateTime.advance(:seconds => @resource.min_duration) %>
+        <% reserved = false %>
+
+        <% for k in @reservedSlots %>
+          <% if currDateTime >= k.startDate and currDateTime < k.endDate %>
+            <% reserved = true %>
+            <% break %>
+          <% end %>
+        <% end %>
+<% 
+=begin%>
+        <% if reserved == false %>
+          <% for k in @sysReservedSlots %>
+            <% if k.recurring == 'One Time' and currDateTime >=k.startDate and currDateTime < k.endDate %>
+              <% reserved = true %>
+            <% elsif k.recurring =='Weekly' and currDateTime.strftime('%A') == k.startDate.strftime('%A') and ((currDateTime.hour()*60 + currDateTime.min()) >= (k.startDate.hour()*60 + k.startDate.min())) and ((currDateTime.hour()*60 + currDateTime.min()) < (k.endDate.hour()*60 + k.endDate.min())) %>
+              <% reserved = true %>
+            <% elsif k.recurring == 'Monthly' and currDateTime.strftime('%d') == k.startDate.strftime('%d') and ((currDateTime.hour()*60 + currDateTime.min()) >= (k.startDate.hour()*60 + k.startDate.min())) and ((currDateTime.hour()*60 + currDateTime.min()) < (k.endDate.hour()*60 + k.endDate.min())) %>
+              <% reserved = true %>
+            <% end %>
+            <% if reserved == true %> 
+              <% break %>
+            <% end %>
+          <% end %>
+        <% end %>
+<%
+=end %>
+        <% if reserved == false %>
+          <td class="plain" style='background-color: Navy' id='<%= currDateTime.to_formatted_s(:long) + '--' + currDateTimeEnd.to_formatted_s(:long)%>' 
+            OnClick="selectCell(this,'Navy', 'Green', 'lightgray', 'red')"> 
+            <%= [ j / 3600, j / 60 % 60 ].map{ |t| t.to_s.rjust(2, '0') }.join(':')  %>
+          </td>
+        <% else %>
+          <td class="plain" style='background-color:red' id='<%= currDateTime.to_formatted_s(:long) + '--' + currDateTimeEnd.to_formatted_s(:long) %>'>
+            <%= [ j / 3600, j / 60 % 60 ].map{ |t| t.to_s.rjust(2, '0') }.join(':')  %>
+          </td>
+        <% end %>
+      <% end %>
+    </tr>
+  <%end%>
+</table>
+
+
+<script type = 'text/javascript'>
+  var start= '';
+  var end = ''; 
+  var table = document.getElementById('resourceTable');
+  var rows = table.getElementsByTagName("tr");
+  
+  function selectCell(element, unselectColour, selectColour, disabledColour, reservedColour) {
+    var cells = element.parentNode.getElementsByTagName("td");
+    if ((start == '' && end =='') || (start != end)){
+      start = element;
+      end = element;
+      toggleAllCells(unselectColour, reservedColour);
+      colourChange(element, selectColour, reservedColour);
+    }
+    else if (element.style.backgroundColor == selectColour){
+      start = '';
+      end = '';
+      toggleAllCells(unselectColour, reservedColour);
+    }
+    else if (element.style.backgroundColor == reservedColour)
+      return;
+    else {
+      cells  = element.parentNode.getElementsByTagName("td");
+      var i = 0;
+      var sameRow = false;
+      var currIndex = -1;
+      var oldIndex = -1;
+      while ( i < cells.length)
+      {
+        if ( cells[i] ==start )
+        {
+          sameRow = true;
+          oldIndex = i;
+          if (oldIndex != -1 && currIndex != -1 ) // Found both current and prev selections
+            break;
+        }
+        if (cells[i] == element)
+        {
+          currIndex = i;
+          if (oldIndex != -1 && currIndex != -1) // Found both current and prev selection
+            break;
+        }
+        else if (cells[i].style.backgroundColor == reservedColour && ( oldIndex != -1 || currIndex != -1)) // Encounter Reserved block between indexes
+        {
+          sameRow = false;
+          break;
+        }
+        i++;
+      }
+      toggleAllCells(unselectColour, reservedColour);
+      if (sameRow == true)
+      {
+        start = cells[Math.min(currIndex,oldIndex)]
+        end = cells[Math.max(currIndex,oldIndex)]
+        i = Math.min(currIndex, oldIndex)
+        while (i <= Math.max(currIndex,oldIndex))
+        {
+          colourChange(cells[i], selectColour, reservedColour);
+          i++;
+        }
+      }
+      else 
+      {
+        start = element;
+        end = element;
+        colourChange(element, selectColour, reservedColour);
+      }
+    }
+
+    if (start == '')
+      document.getElementById('startDate').value = '';
+    else
+      document.getElementById('startDate').value = start.id.split("--")[0];
+    if (end == '')
+      document.getElementById('endDate').value = '';
+    else
+      document.getElementById('endDate').value = end.id.split("--")[1];
+   }
+</script>
+

@@ -1,0 +1,17 @@
+<% content_for(:top) do%>
+<h3>Location of <%=@reservationSystem.name%></h3>
+<% end %>
+
+
+<script type="text/javascript">
+  addLoadEvent(loadMap());
+  var marker_arr = [];
+  var index = marker_arr.length;
+  var temp = "<%= @reservationSystem.location.gsub(/[()]/,'') %>".split(",");
+  marker_arr[index] = { lat: parseFloat(temp[0]) , lng: parseFloat(temp[1]), 
+                        name: "<%= @reservationSystem.name %>", 
+                        description: <% if @reservationSystem.description.nil? %> "" <%else %>"<%= @reservationSystem.description %>" <%end %>,
+                        link: "" }
+  addLoadEvent(function(){placeMarker(marker_arr);});
+</script>
+

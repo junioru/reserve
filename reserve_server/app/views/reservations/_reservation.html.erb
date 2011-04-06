@@ -1,0 +1,49 @@
+<% if params[:mode]=='business' %>
+<tr>
+  <td class='leftCell'>
+	<b><%= reservation.resource.reservation_system.name %></b><br/>
+	<%= reservation.resource.name %> </td>
+  <td class='midCell'>
+	<b><%= reservation.user.name %></b><br/>
+	<%= reservation.user.mobile_number %><br/>
+  From: <%= reservation.startDate %><br/>
+  To: <%= reservation.endDate %>
+  <td class="rightCell">
+	<%= reservation.status %></td>
+</tr>
+<% elsif params[:controller] == 'resources' %>
+<tr>
+ <td class = "leftCell">
+ <td class='midCell'>
+        <b><%= reservation.user.name %></b><br/>
+        <%= reservation.user.mobile_number %><br/>
+  From: <%= reservation.startDate %><br/>
+  To: <%= reservation.endDate %></td>
+  <td class="rightCell">
+        <%= reservation.status %></td>
+</tr>
+<% elsif params[:controller] == 'reservationSystems' %>
+<tr>
+  <td class = "leftCell"><b><%= reservation.resource.name %></b></td>
+ <td class='midCell'>
+        <b><%= reservation.user.name %></b><br/>
+        <%= reservation.user.mobile_number %><br/>
+  From: <%= reservation.startDate %><br/>
+  To: <%= reservation.endDate %>
+</td>
+  <td class = "rightCell"><%= reservation.status %></td>
+</tr>
+<% else %>
+<tr>
+  <td class='leftCell'>
+   <%= link_to (image_tag reservation.resource.photo.url(:thumb)), image_path(reservation.resource.photo.url(:large)), :id=> "single_image" if reservation.resource.photo? %>
+  </td>
+  <td class = 'midCell'>
+  <b><%= reservation.resource.reservation_system.name %><br/>
+  <%= reservation.resource.name %></b><br/>
+  From  : <%= reservation.startDate %><br/>
+  To    : <%= reservation.endDate %><br/>
+  Status: <%= reservation.status %></td>
+  <td class = 'rightCell'><%= link_to "View Details", user_reservation_path(@user, reservation) %></td>
+</tr>
+<% end %>

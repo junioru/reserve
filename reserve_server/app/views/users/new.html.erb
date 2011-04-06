@@ -1,0 +1,36 @@
+<h1>Sign up new user</h1>
+
+<div class = "cssform">
+<%= form_for(@user) do |f| %>
+  <%= render 'shared/error_messages',:object => f.object %>
+  <div class="field">
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :email %><br />
+    <%= f.text_field :email %>
+  </div>
+  <div class="field">
+    <%= f.label :mobile_number, "Mobile Number" %><br />
+    <%= f.text_field :mobile_number %>
+  </div>
+  <div class="field">
+    <%= f.label :password %><br />
+    <%= f.password_field :password %>
+  </div>
+  <div class="field">
+    <%= f.label :password_confirmation, "Enter your password again" %><br />
+    <%= f.password_field :password_confirmation %>
+  </div>
+  <div class="field">
+    <%= f.hidden_field :user_type, :value=>"personal" %>
+  </div>
+  <div class="field">
+    <%= f.submit "Sign up" %>
+  </div>
+</div>
+<br/>
+  <%= link_to "Sign up Vendor Account", 'vendor_signup' %> instead if you want to let users use your reservation system
+<% end %>
+

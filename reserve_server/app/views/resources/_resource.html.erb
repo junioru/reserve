@@ -1,0 +1,63 @@
+<% if params[:action] == 'show' %>
+    <td class="leftCell">
+      <%= link_to (image_tag resource.photo.url(:thumb)),  image_path(resource.photo.url(:large)), :id=> "single_image" %>
+    </td>
+    <td class="midCell">
+	<b><%= resource.name %></b><br/>
+	<% if not resource.reservation_system.category == 'Appointment' %>
+	Capacity: <%= resource.capacity %><br/>
+	<% end %>
+	Start Time: <%= [ resource.startTime.to_i / 3600, resource.startTime.to_i / 60 % 60 ].map{ |t| t.to_s.rjust(2, '0') }.join(':')  %><br/>
+	End Time: <%= [ resource.endTime.to_i / 3600, resource.endTime.to_i / 60 % 60 ].map{ |t| t.to_s.rjust(2, '0') }.join(':')  %><br/>
+    	Duration per Slot:
+	<% if resource.min_duration >= 3600 %>
+		 <%= pluralize(resource.min_duration/3600 , "hour") %>
+	<% end %>	
+	<% if resource.min_duration%3600 > 0 %>
+	  <%= pluralize( (resource.min_duration%3600)/60, "minute") %>
+	<% end %><br/>
+    <% if resource.ratings.size > 0 %>
+      	<%= render 'shared/rating', :rating => resource.average_rating %>
+	Rated by <%= pluralize(resource.ratings.size, "customer")%> 
+    <% else %>
+      No ratings have been left yet
+    <% end %><br/></td>
+    <td class="rightCell">
+	<%= link_to "View Details", user_reservationSystem_resource_path(@user,resource.reservation_system, resource) %><br/><br/><br/>
+	<%= link_to "Edit Resource", edit_user_reservationSystem_resource_path(@user, resource.reservation_system, resource) %></td>
+  </tr>
+<% elsif params[:action] == 'resourceresult' %>
+  <tr>
+    <td class= "leftCell">
+      	<%= link_to (image_tag resource.photo.url(:thumb)),  image_path(resource.photo.url(:large)), :id=> "single_image" %>
+    </td>
+    <td class = "midCell">
+	<b><%= resource.name %></b><br/>
+    	<% if not resource.reservation_system.category == 'Appointment' %>
+    	  Capacity: <%= resource.capacity %><br/>
+	<% end %>
+    <%= resource.description %><br/>
+    <% if resource.ratings.size > 0 %>
+    	<%= render 'shared/rating', :rating => resource.average_rating  %><br/>
+	Ratings left by <%= pluralize(resource.ratings.size, "customer")%>
+    <% else %>
+      No ratings have been left yet
+    <% end %>
+    </td>
+  <td class = "rightCell" style="text-align:center">
+        <% if not resource.reservation_floorplan.nil? %>
+        <%= link_to (image_tag resource.reservation_floorplan.floorplan.url(:thumb)), image_path(resource.reservation_floorplan.floorplan.url(:large)), :id=> "single_image" %>
+        <% end %>
+      <%=  form_tag resourcestatus_path, options = {:method => "get",:id => 'form'+ resource.id.to_s()} do %>
+          <%= hidden_field_tag(:text, @text) %>
+          <%= hidden_field_tag(:capacity, @capacity) %>
+          <%= hidden_field_tag(:startTime, @startTime) %>
+          <%= hidden_field_tag(:endTime, @endTime) %>
+          <%= hidden_field_tag(:startDate, @startDate) %>
+          <%= hidden_field_tag(:resourceID, resource.id) %>
+          <%= hidden_field_tag(:category, @category) %>
+          <%= submit_tag("View Availability")%>
+        <% end%>
+    </td>
+  </tr>
+<% end %>

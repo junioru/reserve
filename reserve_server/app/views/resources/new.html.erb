@@ -1,0 +1,85 @@
+<h1>Add New Reservation Information</h1>
+
+<div class = "cssform">
+<%= form_for @resource, :as=> :resource, :url => {:action => :create}, :html => { :multipart => true } do |f| %>
+  <%= render 'shared/error_messages',:object => f.object %>
+  <div class="field">
+    <%= f.label :name %> <br />
+    <%= f.text_field :name %>
+  </div> 
+<% if not @reservationSystem.category=='Appointment' %>
+  <div class="field">
+    <%= f.label :capacity %><br />
+    <%= f.text_field :capacity %>
+</div>
+<% end %>
+  <div class="field">
+    <%= f.label "Start Time (24 hr format, e.g. 09:00):" %><br />
+    <%= f.text_field :startTime %>
+  </div>
+  <div class="field">
+    <%= f.label "End Time (24 hr format, e.g. 20:30):" %><br />
+    <%= f.text_field :endTime %>
+  </div>
+  <div class="field">
+    <%= f.label "Minimum Duration (mins)" %><br />
+    <%= f.text_field :min_duration %>
+  </div>
+  <div class = "field">
+    <%= f.check_box :allowcancel %>
+    <%= f.label "Allow Cancellations" %><br/>
+  </div>
+  <div class="field">
+    <%= f.label :description %> <br />
+    <%= f.text_area :description %> <br/>
+  </div>
+  <div class="field">
+    <%= f.label 'Photo' %> <br />
+    <%= f.file_field :photo %>
+  </div>
+  
+  <%= label_tag "Select A Floorplan to link the resource to:" %> <br/>
+  <%= radio_button_tag "floorplan_radio", 1, true, {:id => "button1", :onclick => " disableElement('uploadNew'); disableElement('pickExisting')" } %>
+  <%= label_tag "No floorplan" %> <br/><br/>
+  <%= radio_button_tag "floorplan_radio", 2, false, {:id => "button2", :onclick => "disableElement('pickExisting'); enableElement('uploadNew')" } %>
+  <%= label_tag "Upload new a floorplan" %>
+  <div id ="uploadNew" style ="display: none">
+    <%= fields_for :reservation_floorplan do |g| %>
+    <%= g.file_field :floorplan  %><br/> 
+    <%= g.label "Enter a caption for floorplan" %><br/>
+    <%= g.text_field :caption %> 
+  <% end %>
+  </div><br/><br/>
+  <% if not @existingFloorplans.nil? %>
+    <%= radio_button_tag "floorplan_radio", 3, false, {:id => "button3", :onclick => "disableElement('uploadNew'),enableElement('pickExisting')" } %>
+    <%= label_tag "Pick from existing floorplans" %>
+    <div id= 'pickExisting' style="display: none" >
+      <%= select_tag :floorplanId, options_for_select(["Select Floorplan"]) + options_from_collection_for_select(@existingFloorplans, "id", "caption"), 
+          {:id => "floorplanlist", :onchange=>"showThumbnail(this.options[this.selectedIndex].value)" } %>  
+      <div id='thumbnail'></div><br/>
+    </div>
+    <br/>
+  <% else %>
+    <div id = 'pickingExisting'></div>
+  <% end %>
+  <div class="actions">
+    <%= f.submit "Submit" %>
+  </div>
+<% end %>
+</div>
+<script type="text/javascript">
+function showThumbnail(id){
+  var ele = document.getElementById('thumbnail');
+  <% if not @existingFloorplans.nil? %>
+    <% for i in @existingFloorplans %>
+      if (id == '<%= i.id %>')
+      {
+       ele.innerHTML =  '<%= image_tag i.floorplan.url(:thumb) %>';
+        return;
+      }
+    <% end %>
+  <% end %>
+  ele.innerHTML = '';
+
+}
+</script>

@@ -1,0 +1,27 @@
+<h1>Add New Reservation System</h1>
+
+<div class = "cssform">
+<%= form_for :reservationSystem, @reservationSystem, :url => {:action => "create"} do |f| %>
+  <%= render 'shared/error_messages',:object => f.object %>
+  <div class="field">
+    <%= f.label :name %> <br />
+    <%= f.text_field :name %>
+  </div>
+   <div class="field">
+    <%= f.label :category, "Reservation Category" %><br />
+    <%= f.select :category, CATEGORY %>
+  </div>
+    <div class="field">
+    <%= f.label :address %> <br />
+    <%= f.text_field :address %>
+  </div>
+  <div class="field">
+    <%= f.label :description %> <br />
+    <%= f.text_area :description %>
+  </div>
+  <div class="field">
+    <%= f.submit "Submit" %>
+  </div>
+</div>
+<% end %>
+

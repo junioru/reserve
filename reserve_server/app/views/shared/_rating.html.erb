@@ -1,0 +1,8 @@
+<% for i in 0...rating.to_i %>
+  <%= image_tag 'star-bright.png' %>
+<% end %>
+<% if (rating%1) >= 0.5 %>
+  <%= image_tag 'star-half.png' %>
+<% end%>
+
+<%= sprintf("%.1f", rating) %> / 5.0

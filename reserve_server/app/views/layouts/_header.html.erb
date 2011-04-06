@@ -1,0 +1,35 @@
+<header>
+  <div id="navbar" width = "100%">
+  <span class="inbar" width = "100%">
+    <ul>
+      <li class="navhome"   style ="width:25%"><%= link_to (content_tag(:span, "Main")), root_path %></li>
+      <% if signed_in?%>
+      <li style ="width:25%"><%= link_to (content_tag(:span, "Profile")), edit_user_path(current_user) %> </li>
+      <li style ="width:25%"><%= link_to (content_tag(:span, "Sign out")), signout_path, :method => :delete %></li>
+      <% else %>
+      <li style = "width:25%"></li>
+      <li style = "width:25%"><%= link_to (content_tag(:span, "Sign in")), signin_path  %></li>
+      <% end %>
+      <li class="navhome"  style = "width:25%"><%= link_to  (content_tag(:span,"Back")) , "javascript: history.go(-1)" %></li>
+</div>
+
+    </ul>
+  </span>
+  </div> 
+  <% if signed_in? %>
+  <div id = "navbar" width = "100%">
+    <span class = "inbar" width="100%">
+      <ul>
+      <% if current_user.user_type == 'business' %>
+      <li style ="width:50%"><%= link_to (content_tag(:span, "My Resources")), user_path(current_user, :mode => 'business') %> </li>
+      <li style ="width:50%"><%= link_to (content_tag(:span, "My Reservations")), user_path(current_user)  %></li>
+      <% else %>
+      <li style ="width:100%"><%= link_to (content_tag(:span, "My Reservations")), user_path(current_user)  %></li>
+      <% end %>
+      </ul>
+    </span>
+  </div>
+  <% end %>
+  
+</header>
+

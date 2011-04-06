@@ -1,0 +1,28 @@
+
+<h1>Upgrade to Vendor Account</h1>
+
+<div css = "cssform">
+<%= form_for(@user) do |f| %>
+  <%= render 'shared/error_messages', :object => f.object %>
+ <div class="field">
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </div>
+
+  <div class="field">
+    <%= f.label :business_name, "Name of business/company" %> <br />
+    <%= f.text_field :business_name %>
+  </div>
+  <div class="field">
+    <%= f.label :business_category, "Business category" %> <br />
+    <%= f.select :business_category, BUSINESS_CATEGORY  %>
+  </div>
+  <div class="field">
+    <%= f.hidden_field :user_type, :value => "business" %>
+  </div>
+  <div class="field">
+    <%= f.submit "Upgrade" %>
+  </div>
+</div>
+<% end %>
+

@@ -1,0 +1,46 @@
+<% content_for(:head) do%>
+  <%= javascript_include_tag 'jquery.fancybox-1.3.4.pack', 'jquery.easing-1.3.pack','fancy_box', 'jquery.maphilight.min'  %>
+  <%= stylesheet_link_tag 'jquery.fancybox-1.3.4.css' %>
+<% end %>
+
+<h1> <%= @reservationSystem.name + ' - ' +@resource.name %> </h1>
+
+<b>System Category:</b> <%= @reservationSystem.category %> <br/>
+<b>Capacity:</b> <%= @resource.capacity %><br/>
+<b>Description:</b><% if @resource.description.nil? %>
+              None
+            <%else%>
+              <%= @resource.description %>
+            <% end %> <br/>
+<b>Start Time:</b> <%= @resource.startTime %><br/>
+<b>End Time:</b> <%= @resource.endTime  %><br/>
+<b>Minimum Duration:</b> <%= @resource.min_duration/60 %> minutes <br/>
+<b>Allow Cancellations:</b> <%= @resource.allowcancel %> <br/>
+<b>
+Photos:</b> <% if @resource.photo.file? %> 
+<br/>        <%= link_to (image_tag @resource.photo.url(:thumb)), @resource.photo.url(:large), :id=> "single_image" %>
+        <% else %>
+          None
+        <% end %><br/>
+<b>Floorplans:</b><br/>
+	 <% if not @resource.reservation_floorplan.nil? %>
+		<%= link_to (image_tag @resource.reservation_floorplan.floorplan.url(:thumb)), image_path(@resource.reservation_floorplan.floorplan.url(:large)), :id => "single_image" %><br/>
+	<% end %>
+
+<div id = "buttonwrapper">
+<%= link_to content_tag(:span,"Edit Resource information"), edit_user_reservationSystem_resource_path, :class => "boldbuttons" %> 
+</div><br/>
+
+<% unless @reservations.empty? %>
+    <h3>Past Reservations On <%= @reservationSystem.name %> </h3>
+    <table class ="roundTable" summary="Reservations">
+      <%= render @reservations %>
+    </table>
+    <%= will_paginate @reservations %>
+<% end %>
+<br/><br/>
+
+
+<div id="buttonwrapper">
+<%= link_to content_tag(:span,"Delete Resource From System"), user_reservationSystem_resource_path, html_options = {:method => :delete, :confirm => "Are you sure you want to remove the resource? This action is irrevisible",:title => "Delete #{@resource.name}", :class => "redbuttons"} %>
+</div>

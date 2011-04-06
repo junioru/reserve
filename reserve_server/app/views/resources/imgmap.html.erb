@@ -1,0 +1,29 @@
+<% content_for(:head) do%>
+  <%= include_tiny_mce_if_needed %> 
+<% end %>
+
+
+<h1>Set Image Map</h1>
+
+<h3> If you are using a mobile browser, you may not be able to view the editor. Click submit to continue.</h3>
+
+<div class = "cssform">
+<%= form_for @resource, :as=> :resource, :url => {:action => :update} do |f| %>
+  <%= render 'shared/error_messages',:object => f.object %>
+  <div class="field" style="position:absolute; top:-1000px; left:-1000px;">
+    <%= f.label "ImageMap Creator" %> <br />
+    <%= f.text_area :html ,:class => :mceEditor %> 
+  </div>
+  <div class="actions">
+    <%= f.label 'Click Submit to complete the process' %><br/>
+    <%= f.submit "Submit" %>
+  </div>
+<% end %> 
+</div>
+
+<script type='text/javascript'>
+  var text = 'abc';
+  addLoadEvent(function(){tinyMCE.activeEditor.setContent('<%= image_tag (@floorplan.floorplan.url(:large)), :id =>"floorplan_img"%>');});
+   addLoadEvent(function(){tinyMCE.execCommand('mceimgmapPopup');});
+</script>
+

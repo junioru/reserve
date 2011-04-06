@@ -1,0 +1,23 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  owner_id: 1
+  category: MyString
+  system_name: MyString
+  room_name: MyString
+  location: MyString
+  capacity: 1
+  description: MyText
+  startTime: 2011-01-18 19:29:52
+  endTime: 2011-01-18 19:29:52
+
+two:
+  owner_id: 1
+  category: MyString
+  system_name: MyString
+  room_name: MyString
+  location: MyString
+  capacity: 1
+  description: MyText
+  startTime: 2011-01-18 19:29:52
+  endTime: 2011-01-18 19:29:52

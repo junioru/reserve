@@ -1,0 +1,226 @@
+<% content_for(:head) do%>
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+   <script type="text/javascript">
+
+// load the Google data JS Client Library
+google.load("gdata", "2.x", {packages: ["calendar"]});
+
+// Constants used as element IDs in the DOM
+var DEFAULT_PANE = "default-pane";
+var AUTHENTICATED_PANE = "authenticated-pane";
+var AUTH_BUTTON = "auth-button"; 
+var LOGOUT_BUTTON = "logout-button"; 
+var SAVE_BUTTON = "save-button";
+
+// Location of the event feed of the primary calendar for the authenticated user
+var EVENT_FEED_URL = 
+    "https://www.google.com/calendar/feeds/default/private/full";
+
+// A google.gdata.calendar.CalendarService object that can be used to access
+// private feed using AuthSub.
+var myService;
+var entry;
+var when;
+
+/**
+ * Sets the global calendar service to a new instance.  Also resets the form 
+ * fields to clear out any information that may have been cached.
+ */
+function init() {
+  google.gdata.client.init(handleError);
+
+  var token = google.accounts.user.checkLogin(EVENT_FEED_URL);
+  // Write the token to the console for debug
+  //google.gdata.util.log("token: '" + token + "'");
+
+  myService = 
+      new google.gdata.calendar.CalendarService("reservation");
+
+
+  // Create a When object that will be attached to the event
+  when = new google.gdata.When();
+  // Create an instance of CalendarEventEntry representing the new event
+  entry = new google.gdata.calendar.CalendarEventEntry();
+
+  // Set the title of the event
+  entry.setTitle(google.gdata.atom.Text.create('Reservation Reminder For <%= @reservation.resource.reservation_system.name %>'));
+  var eventContents = "Reservation at <%= @reservation.resource.reservation_system.name %>'s <%= @reservation.resource.name %>. Your reservationis from <%= @reservation.startDate %> to <%= @reservation.endDate %>. View additional details from Reserve application.";
+  entry.setContent(google.gdata.atom.Text.create(eventContents));
+  // Set the start and end time of the When object
+  var startTime = google.gdata.DateTime.fromIso8601("<%= @reservation.startDate.strftime('%Y-%m-%dT%H:%M:%S.00') %>");
+  var endTime = google.gdata.DateTime.fromIso8601("<%= @reservation.endDate.strftime('%Y-%m-%dT%H:%M:%S.00') %>");
+  when.setStartTime(startTime);
+  when.setEndTime(endTime);
+
+  var authButton = document.getElementById(AUTH_BUTTON);
+  if (google.accounts.user.checkLogin(EVENT_FEED_URL)) {
+    document.getElementById(DEFAULT_PANE).style.display = "none";
+    document.getElementById(AUTHENTICATED_PANE).style.display = "inline";
+  } else {
+    document.getElementById(DEFAULT_PANE).style.display = "inline";
+    document.getElementById(AUTHENTICATED_PANE).style.display = "none";
+  } 
+};
+
+google.setOnLoadCallback(init);
+
+/**
+ * Requests an AuthSub token for interaction with the Calendar service.
+ */
+function login() {
+  var token = google.accounts.user.login(EVENT_FEED_URL);
+};
+
+/**
+ * Revokes the AuthSub token and resets the page.
+ */
+function logout(){
+  google.accounts.user.logout();
+  init();
+};
+
+function saveEvent(time, mode){
+  // Create a Reminder object that will be attached to the When object
+  var reminder = new google.gdata.Reminder()
+  switch(time)
+  {
+    case '0':
+      reminder.setMinutes(30);
+      break;
+    case '1':
+      reminder.setHours(1);
+      break;
+    case '2':
+      reminder.setHours(2);
+      break;
+    case '3':
+      reminder.setHours(6);
+      break;
+    case '4':
+      reminder.setHours(12);
+      break;      
+    case '5':
+      reminder.setDays(1);
+      break;
+    case '6':
+      reminder.setDays(2);
+      break;
+    default:
+      reminder.setDays(1);
+  }
+
+  switch(mode)
+  {
+    case '0':
+      reminder.setMethod(google.gdata.Reminder.METHOD_ALERT);
+      break;
+    case '1':
+      reminder.setMethod(google.gdata.Reminder.METHOD_EMAIL);
+      break;
+    case '2':
+      reminder.setMethod(google.gdata.Reminder.METHOD_SMS);
+      break;
+    default:
+      reminder.setMethod(google.gdata.Reminder.METHOD_ALL);
+  }
+  
+  // Add the reminder with the When object
+  when.addReminder(reminder);
+
+  // Add the When object to the event
+  entry.addTime(when);
+
+// The callback method that will be called after a successful insertion from insertEntry()
+var callback = function(result) {
+ alert("You have successfully added the reminder");
+  window.location = "<%= user_url(current_user) %>"; 
+}
+
+
+var calendarService = new google.gdata.calendar.CalendarService('Reservation');
+calendarService.insertEntry(EVENT_FEED_URL, entry, callback,
+    handleError, google.gdata.calendar.CalendarEventEntry);
+
+}
+
+
+
+/**
+ * Creates a popup alert to notify the user of a Google data related error.
+ * 
+ * @param {Object} An error that occurred while attempting to interact with
+ *   the Google Calendar service.  
+ */
+function handleError(e) {
+  if (e instanceof Error) {
+    // Alert with the error line number, file and message.
+    alert('Error at line ' + e.lineNumber +
+        ' in ' + e.fileName + '\n' +
+        'Message: ' + e.message);
+    // If available, output HTTP error code and status text
+    if (e.cause) {
+      var errorStatus = e.cause.status;
+      var statusText = e.cause.statusText;
+      alert('Root cause: HTTP error ' + errorStatus + ' with status text of: ' +
+          statusText);
+    }
+  } else {
+    alert(e.toString());
+  }
+};
+
+</script>
+<% end %>
+
+<h2>Create Reminder For Your Reservation</h2>
+If you have a google account, you can add the reservation to your google calendar.<br/>
+This will allow you to receive SMS and email reminders on your mobile phone or sync your mobile phone calendar with google's calendar to add the reservation to your calendar. <br/><br/>
+You may skip this process if you do not want to receive reminders<br/>
+<table style="color:black; width:100%;" >
+  <tr id="default-pane" style="display:none">
+    <td class="plain" style="text-align:center; vertical-align:middle">
+      <input id="auth-button" type="button" value="Login To My Google Account" onclick="login()"/>  
+    </td>
+  </tr>
+  <tr id="authenticated-pane" style="display:none"> 
+    <td class="plain" style="background-color: rgb(158,200,255);text-align:center;">
+      <div id="event-table">
+        <table class="plain" style="margin: 5px 10px 0px 10px">
+          <tr>
+            <td class="plain eventinfo"><b>Title:</b></td>
+            <td class="plain eventinfo">Reservation Reminder For <%= @reservation.resource.reservation_system.name %></td>
+          </tr>
+          <tr>
+            <td class="plain eventinfo"><b>From:</b></td>
+            <td class="plain eventinfo"><%= @reservation.startDate %></td>
+          </tr>
+          <tr>
+            <td class="plain eventinfo"><b>To:</b></td>
+            <td class="plain eventinfo"><%= @reservation.endDate %></td>
+          </tr>
+
+          <tr>
+            <td class="plain eventinfo"><b>Send Me Reminder:</b></td>
+            <td class="plain eventinfo"><%= select("reminder", "time", options_for_select([["30min", 0], ["1 hour", 1], ["2 hours",2], ["6 hours",3], ["12 hours",4], ["1 day", 5], ["2 days", 6], ["1 week", 7]])) %> before start of reservation</td>
+          </tr>
+          <tr>
+            <td class="plain eventinfo"><b>Receive Reminder Via:</b></td>
+            <td class="plain eventinfo">
+              <%= select("reminder", "mode", options_for_select([["Calendar Alert", 0], ["SMS", 1], ["Email",2], ["All Methods",3]]))%></td>
+          </tr>
+        </table>
+        <input id="logout-button" type="button" value="Logout" onclick="logout()" style="float:center; margin:5px 0px 5px 0px;"/>
+        <input id="save-button" type="button" value="Save to Google Calendar" onclick="saveEvent(document.getElementById('reminder_time').value, document.getElementById('reminder_mode').value);" style="float:center; margin:5px 0px 5px 0px;"/>
+        <div id="status-area" style="float:right; margin:5px 0px 5px 0px;"></div>
+      </div>
+    </td>
+  </tr>
+</table>
+
+<div id="buttonwrapper">
+<%= link_to content_tag(:span,'No, I do not want to receive reminders'), user_path(current_user), :class=>"redbuttons", :id => "continue" %> 
+</div>
+
+
+
+

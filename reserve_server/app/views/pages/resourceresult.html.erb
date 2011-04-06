@@ -1,0 +1,48 @@
+<% content_for(:head) do%>
+  <%= javascript_include_tag 'jquery.fancybox-1.3.4.pack', 'jquery.easing-1.3.pack','fancy_box', 'jquery.maphilight.min'  %>
+  <%= stylesheet_link_tag 'jquery.fancybox-1.3.4.css' %>
+<script>$(function() {
+    $('.map').maphilight({fillOpacity:0.4, strokeOpacity: 0.5, alwaysOn: true});
+  });</script>
+<% end %>
+
+
+
+<h1>Search Results </h1>
+<h3><div style="float:left;width:50%;"><%= link_to_function content_tag(:span,"List View"), "enableElement('listView'); disableElement('floorplanView')" %></div>
+<div style="float:left;width:50%;"><%= link_to_function content_tag(:span,"Floorplan View"), "disableElement('listView'); enableElement('floorplanView')" %></div></h3>
+<div style="display:block"><h2> Found <%= pluralize(@results.length, "Match") %> in <%= @reservationSystem.name %></h2>
+</div>
+
+<div id = "listView">
+<table class ="roundTable" summary="Search Results">
+         <%= render @results %>
+</table>
+
+<%= will_paginate @results, :params =>{:page => 'resourceresult'} %>
+</div>
+
+<div id="floorplanView" style="display:none" >
+<% for i in 0...@imgmaps.length %>
+  <%= raw(@imgmaps[i]) %>
+<% end %>
+</div>
+
+
+
+<% for i in @results %>
+<div style="display:none"><div id="resource<%= i.id %>" style="color:black">
+  <b><%= i.name %></b><br/>
+  <%= image_tag i.photo.url(:thumb) if i.photo? %>
+  Capacity: <%= i.capacity %><br/>
+  <%= i.description %><br/>
+  <% if i.ratings.size > 0 %>
+      <div title = '<%= pluralize(i.ratings.size, "customer")%> left rating for this' ><%= render 'shared/rating', :rating => i.average_rating  %></div>
+  <% else %>
+      <div>No ratings have been left yet</div>
+  <% end %><br/>
+
+  <%= button_to "View Availability" , "javascript: document.forms['form"+ i.id.to_s()+"'].submit();" %>
+</div></div>
+
+<%end %>

@@ -1,0 +1,44 @@
+<h1>Edit My Profile</h1>
+
+<div class = "cssform">
+<%= form_for(@user) do |f| %>
+  <%= render 'shared/error_messages', :object => f.object %>
+  <div class = "field">
+    <%= f.label :name %><br/>
+    <%= f.text_field :name %>
+  </div>
+  <div class = "field">
+    <%= f.label :email %><br />
+    <%= f.text_field :email %>
+  </div>
+  <div class = "field">
+    <%= f.label :mobile_number, "Mobile Number" %> <br />
+    <%= f.text_field :mobile_number %>
+  </div>
+  <div class="field">
+    <%= f.label :password %><br />
+    <%= f.password_field :password %>
+  </div>
+  <div class="field">
+    <%= f.label :password_confirmation, "Confirmation" %><br />
+    <%= f.password_field :password_confirmation %>
+  </div>
+  <% if @user.user_type=='business' %>
+    <div class="field">
+    <%= f.label :business_name, "Name of business/company" %> <br />
+    <%= f.text_field :business_name %>
+  </div>
+  <div class="field">
+    <%= f.label :business_category, "Business category" %> <br />
+    <%= f.select :business_category, BUSINESS_CATEGORY  %>
+  </div>
+  <% end %>
+ <div class = "field">
+    <%= f.submit "Update" %>
+  </div>
+<% end %>
+</div>
+<br/>
+<% unless @user.user_type=='business' %>  
+  <%= link_to 'Upgrade to business account', upgrade_user_path %> 
+<% end %>

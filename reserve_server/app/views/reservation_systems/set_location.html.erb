@@ -1,0 +1,24 @@
+<% content_for(:top) do%>
+<h3>Select location of your reservation system</h3>
+<div class="cssform">
+<%= form_for @reservationSystem, :url => {:action => "update"}  do |f| %>
+ <div class="field" style="display:none">
+    <%= f.label :location  %>
+    <%= f.text_field :location, :readonly => 'true'%>
+  </div>
+  <div class="field">
+    <%= f.submit "Update Location" %>
+  </div>
+<% end %>
+</div>
+<% end %>
+
+
+
+
+<script type="text/javascript">
+
+addLoadEvent(function(){getLocation('reservation_system_location', '<%= @reservationSystem.address %>');});
+
+</script>
+
